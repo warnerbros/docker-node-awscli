@@ -1,50 +1,45 @@
-FROM ubuntu:16.04
-
-# Install base dependencies
-RUN apt-get update \
-    && apt-get install -y \
-        software-properties-common \
-        build-essential \
-        wget \
-        xvfb \
-        curl \
-        git \
-        mercurial \
-        maven \
-        openjdk-8-jdk \
-        ant \
-        ssh-client \
-        unzip \
-        iputils-ping \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install nvm with node and npm
-ENV NODE_VERSION=10.14.1 \
-    NVM_DIR=/root/.nvm \
-    NVM_VERSION=0.33.11
-
-RUN mkdir $NVM_DIR \
-    && curl https://raw.githubusercontent.com/creationix/nvm/v$NVM_VERSION/install.sh | bash \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
-
-# Set node path
-ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
-
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+FROM ubuntu:18.04
 
 # Default to UTF-8 file.encoding
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     LANGUAGE=C.UTF-8
 
-# Xvfb provide an in-memory X-session for tests that require a GUI
-ENV DISPLAY=:99
+# Install base dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        software-properties-common \
+        wget \
+        curl \
+        git \
+        unzip \
+        apt-transport-https \
+        jq \
+        python3-pip \
+        python3-setuptools \
+        gpg-agent \
+    && pip3 install --upgrade pip \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the path.
-ENV PATH=$NVM_DIR:$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+RUN pip3 install awscli
+
+# install node/yarn
+COPY nodesource.gpg.key /tmp/nodesource.gpg.key
+COPY yarn-pubkey.gpg /tmp/yarn-pubkey.gpg
+RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
+    && echo 'deb https://deb.nodesource.com/node_10.x bionic main' > /etc/apt/sources.list.d/nodesource.list \
+    && echo 'deb-src https://deb.nodesource.com/node_10.x bionic main' >> /etc/apt/sources.list.d/nodesource.list \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs yarn \
+    # we're breaking the package manager here because for some reason,
+    # nodejs comes with a hard dependency on python 2.7
+    && dpkg -r --force-depends libpython2.7-minimal python-minimal python2.7-minimal \
+    && rm -rf /usr/lib/python2.7 \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm /tmp/nodesource.gpg.key \
+    && rm /tmp/yarn-pubkey.gpg
 
 # Create dirs and users
 RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
