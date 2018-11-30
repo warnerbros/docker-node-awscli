@@ -1,5 +1,4 @@
 FROM ubuntu:16.04
-MAINTAINER Bitbucket Pipelines
 
 # Install base dependencies
 RUN apt-get update \
@@ -20,11 +19,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install nvm with node and npm
-ENV NODE_VERSION=8.9.4 \
+ENV NODE_VERSION=10.14.1 \
     NVM_DIR=/root/.nvm \
-    NVM_VERSION=0.33.8
+    NVM_VERSION=0.33.11
 
-RUN curl https://raw.githubusercontent.com/creationix/nvm/v$NVM_VERSION/install.sh | bash \
+RUN mkdir $NVM_DIR \
+    && curl https://raw.githubusercontent.com/creationix/nvm/v$NVM_VERSION/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
     && nvm alias default $NODE_VERSION \
