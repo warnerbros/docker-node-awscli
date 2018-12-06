@@ -18,6 +18,7 @@ RUN apt-get update \
         python3-pip \
         python3-setuptools \
         gpg-agent \
+        time \
     && pip3 install --upgrade pip \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
@@ -45,6 +46,12 @@ RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
 RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
     && sed -i '/[ -z \"PS1\" ] && return/a\\ncase $- in\n*i*) ;;\n*) return;;\nesac' /root/.bashrc \
     && useradd --create-home --shell /bin/bash --uid 1000 pipelines
+
+# install saw
+RUN wget https://github.com/TylerBrock/saw/releases/download/v1.2.1/saw_1.2.1_linux_amd64.tar.gz \
+    && tar -xzvf saw_1.2.1_linux_amd64.tar.gz saw \
+    && mv saw /usr/local/bin \
+    && rm saw_1.2.1_linux_amd64.tar.gz
 
 WORKDIR /opt/atlassian/bitbucketci/agent/build
 ENTRYPOINT /bin/bash
