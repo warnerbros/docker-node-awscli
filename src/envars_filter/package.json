@@ -1,0 +1,36 @@
+{
+  "name": "envars_filter",
+  "version": "1.0.0",
+  "description": "Prevents sensitive credentials from leaking into log files",
+  "main": "envars_filter.js",
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "mocha --growl --recursive \"./*.test.js\"",
+    "test:unit:watch": "mocha --growl -w --recursive \"./*.test.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/warnerbros/docker-node-awscli.git"
+  },
+  "keywords": [
+    "log",
+    "secret",
+    "credentials",
+    "security",
+    "secure"
+  ],
+  "author": "Richard Nienaber",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/warnerbros/docker-node-awscli/issues"
+  },
+  "homepage": "https://github.com/warnerbros/docker-node-awscli#readme",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "growl": "^1.10.5",
+    "mocha": "^6.1.4"
+  },
+  "dependencies": {
+    "escape-string-regexp": "^2.0.0"
+  }
+}

@@ -26,8 +26,8 @@ RUN apt-get update \
 RUN pip3 install awscli
 
 # install node/yarn
-COPY nodesource.gpg.key /tmp/nodesource.gpg.key
-COPY yarn-pubkey.gpg /tmp/yarn-pubkey.gpg
+COPY docker/10/ubuntu/nodesource.gpg.key /tmp/nodesource.gpg.key
+COPY docker/10/ubuntu/yarn-pubkey.gpg /tmp/yarn-pubkey.gpg
 RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
     && echo 'deb https://deb.nodesource.com/node_10.x bionic main' > /etc/apt/sources.list.d/nodesource.list \
     && echo 'deb-src https://deb.nodesource.com/node_10.x bionic main' >> /etc/apt/sources.list.d/nodesource.list \
@@ -48,10 +48,22 @@ RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
     && useradd --create-home --shell /bin/bash --uid 1000 pipelines
 
 # install saw
-RUN wget https://github.com/TylerBrock/saw/releases/download/v1.2.1/saw_1.2.1_linux_amd64.tar.gz \
-    && tar -xzvf saw_1.2.1_linux_amd64.tar.gz saw \
+RUN wget https://github.com/TylerBrock/saw/releases/download/v0.2.2/saw_0.2.2_linux_amd64.tar.gz \
+    && tar -xzvf saw_0.2.2_linux_amd64.tar.gz saw \
     && mv saw /usr/local/bin \
-    && rm saw_1.2.1_linux_amd64.tar.gz
+    && rm saw_0.2.2_linux_amd64.tar.gz
+
+# add envars_filter to path
+ENV NODE_PATH /usr/lib/node_modules
+COPY src/envars_filter/envars_filter.js /usr/local/bin/envars_filter
+RUN chmod 555 /usr/local/bin/envars_filter
+RUN npm install -g escape-string-regexp@2.0.0
+
+# add secrets_loader to path
+COPY src/secrets_loader/secrets_loader /usr/local/bin/secrets_loader
+COPY src/secrets_loader/json_to_exports.js /usr/local/bin/json_to_exports
+RUN chmod 555 /usr/local/bin/json_to_exports
+RUN chmod 555 /usr/local/bin/secrets_loader
 
 WORKDIR /opt/atlassian/bitbucketci/agent/build
 ENTRYPOINT /bin/bash
