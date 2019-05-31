@@ -14,7 +14,7 @@ function convertJsonToExports(json, app) {
 
   return prefixedExports.concat(nonPrefixedExports)
     .filter(([key]) => !process.env[key]) // don't overwrite secrets that already exist in the environment
-    .map(([key, value]) => `export ${key}=${value}`).join('\n');
+    .map(([key, value]) => `export ${key}='${value.replace(/'/g, '\'')}'`).join('\n');
 }
 
 function main() {
