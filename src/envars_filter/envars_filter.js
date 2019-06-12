@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-const { execFile } = require('child_process');
-const escapeStringRegexp = require('escape-string-regexp');
+const { spawn } = require('child_process');
+
+// taken from: https://github.com/sindresorhus/escape-string-regexp/blob/21c557c7f14a112eebe196abd98d085f5fcfcf5e/index.js#L3
+const matchOperatorsRegex = /[|\\{}()[\]^$+*?.-]/g;
 
 const shortIntegerRegex = /^\d{1,4}$/;
-
 function filterEnvironmentVariables(whitelist, log, name, value) {
   if (name === 'CREDENTIAL_FILTER_WHITELIST') {
     return false;
@@ -36,7 +37,8 @@ class EnvarsFilter {
     this.values = Object.entries(env)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .filter(([k, v]) => filterEnvironmentVariables(whitelist, log, k, v))
-      .map(([, v]) => new RegExp(escapeStringRegexp(v), 'g'))
+      .map(([, v]) => v.replace(matchOperatorsRegex, '\\$&')) // escape potential regex
+      .map((v) => new RegExp(v), 'g')
       .sort((a, b) => b.source.length - a.source.length);
   }
 
@@ -50,7 +52,7 @@ function main() {
   const filter = new EnvarsFilter();
 
   const [scriptFile, ...args] = process.argv.slice(2);
-  const childProcess = execFile(scriptFile, args);
+  const childProcess = spawn(scriptFile, args);
 
   const outputFilteredText = data => process.stdout.write(filter.filter(data));
   childProcess.stdout.on('data', outputFilteredText);

@@ -57,7 +57,6 @@ RUN wget https://github.com/TylerBrock/saw/releases/download/v0.2.2/saw_0.2.2_li
 ENV NODE_PATH /usr/lib/node_modules
 COPY src/envars_filter/envars_filter.js /usr/local/bin/envars_filter
 RUN chmod 555 /usr/local/bin/envars_filter
-RUN npm install -g escape-string-regexp@2.0.0
 
 # add secrets_loader to path
 COPY src/secrets_loader/secrets_loader /usr/local/bin/secrets_loader
