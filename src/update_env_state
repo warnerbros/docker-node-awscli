@@ -28,6 +28,7 @@ while [ "$1" != "" ]; do
   shift 2
 done
 
+APP="${APP:-$BITBUCKET_REPO_SLUG}"
 
 if [ -z "$BRANCH" ]; then
   if [ -z "$BITBUCKET_BRANCH" ]; then
@@ -53,14 +54,7 @@ if [ -z "$SHA" ]; then
   fi
 fi
 
-echo ENV=$ENV
-echo APP=$APP
-echo BRANCH=$BRANCH
-echo COMMIT_DATE=$COMMIT_DATE
-echo DATE=$DATE
-echo SHA=$SHA
-
-echo Updating state for $ENV: branch=$BRANCH, commitDate=$COMMIT_DATE, date=$DATE, sha=$SHA
+echo Updating state for $ENV: app=$APP, branch=$BRANCH, commitDate=$COMMIT_DATE, date=$DATE, sha=$SHA
 echo Retrieving current environment state for $ENV
 OLD_STATE=`aws secretsmanager get-secret-value --secret-id "$ENV"_environment_state | jq -r '.SecretString'`
 
@@ -76,7 +70,7 @@ NEW_STATE="$(echo $OLD_STATE | jq -cr \
     --arg commitDate $COMMIT_DATE \
     --arg date $DATE \
     --arg sha $SHA \
-    ".$APP = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha }")"
+    ".\"$APP\" = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha }")"
 
 echo Updating environment state for $ENV
 aws secretsmanager update-secret --secret-id "$ENV"_environment_state --secret-string "$NEW_STATE" > /dev/null
