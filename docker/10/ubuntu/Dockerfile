@@ -61,8 +61,10 @@ RUN chmod 555 /usr/local/bin/envars_filter
 # add secrets_loader to path
 COPY src/secrets_loader/secrets_loader /usr/local/bin/secrets_loader
 COPY src/secrets_loader/json_to_exports.js /usr/local/bin/json_to_exports
+COPY src/update_env_state /usr/local/bin/update_env_state
 RUN chmod 555 /usr/local/bin/json_to_exports
 RUN chmod 555 /usr/local/bin/secrets_loader
+RUN chmod 555 /usr/local/bin/update_env_state
 
 WORKDIR /opt/atlassian/bitbucketci/agent/build
 ENTRYPOINT /bin/bash

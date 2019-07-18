@@ -1,0 +1,83 @@
+#!/usr/bin/env sh
+
+while [ "$1" != "" ]; do
+  case $1 in
+    -e | --env )
+      ENV=$2
+      ;;
+    -a | --app )
+      APP=$2
+      ;;
+    -b | --branch )
+      BRANCH=$2
+      ;;
+    -c | --commit-date )
+      COMMIT_DATE=$2
+      ;;
+    -d | --date )
+      DATE=$2
+      ;;
+    -n | --build-no )
+      BUILD_NO=$2
+      ;;
+    -s | --sha )
+      SHA=$2
+      ;;
+    * )
+  esac
+  shift 2
+done
+
+
+if [ -z "$BRANCH" ]; then
+  if [ -z "$BITBUCKET_BRANCH" ]; then
+    BRANCH=`git rev-parse --abbrev-ref HEAD`
+  else
+    BRANCH="$BITBUCKET_BRANCH"
+  fi
+fi
+
+if [ -z "$COMMIT_DATE" ]; then
+  COMMIT_DATE=`git log --pretty=format:'%cI' -n 1`
+fi
+
+if [ -z "$DATE" ]; then
+  DATE=`date -Is`
+fi
+
+if [ -z "$SHA" ]; then
+  if [ -z "$BITBUCKET_COMMIT" ]; then
+    SHA=`git log --pretty=format:'%h' -n 1`
+  else
+    SHA="$BITBUCKET_COMMIT"
+  fi
+fi
+
+echo ENV=$ENV
+echo APP=$APP
+echo BRANCH=$BRANCH
+echo COMMIT_DATE=$COMMIT_DATE
+echo DATE=$DATE
+echo SHA=$SHA
+
+echo Updating state for $ENV: branch=$BRANCH, commitDate=$COMMIT_DATE, date=$DATE, sha=$SHA
+echo Retrieving current environment state for $ENV
+OLD_STATE=`aws secretsmanager get-secret-value --secret-id "$ENV"_environment_state | jq -r '.SecretString'`
+
+set -e
+
+if [ -z "$OLD_STATE" ]; then
+    OLD_STATE="{}"
+fi
+
+NEW_STATE="$(echo $OLD_STATE | jq -cr \
+    --arg app $APP \
+    --arg branch $BRANCH \
+    --arg commitDate $COMMIT_DATE \
+    --arg date $DATE \
+    --arg sha $SHA \
+    ".$APP = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha }")"
+
+echo Updating environment state for $ENV
+aws secretsmanager update-secret --secret-id "$ENV"_environment_state --secret-string "$NEW_STATE" > /dev/null
+echo Environment state for $ENV updated
