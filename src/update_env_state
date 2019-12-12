@@ -17,8 +17,8 @@ while [ "$1" != "" ]; do
     -d | --date )
       DATE=$2
       ;;
-    -n | --build-no )
-      BUILD_NO=$2
+    -n | --build-number )
+      BUILD_NUMBER=$2
       ;;
     -s | --sha )
       SHA=$2
@@ -54,6 +54,14 @@ if [ -z "$SHA" ]; then
   fi
 fi
 
+if [ -z "$BUILD_NUMBER" ]; then
+  if [ -z "$BITBUCKET_BUILD_NUMBER" ]; then
+    BUILD_NUMBER=-1
+  else
+    BUILD_NUMBER="$BITBUCKET_BUILD_NUMBER"
+  fi
+fi
+
 echo Updating state for $ENV: app=$APP, branch=$BRANCH, commitDate=$COMMIT_DATE, date=$DATE, sha=$SHA
 echo Retrieving current environment state for $ENV
 OLD_STATE=`aws secretsmanager get-secret-value --secret-id "$ENV"_environment_state | jq -r '.SecretString'`
@@ -70,7 +78,8 @@ NEW_STATE="$(echo $OLD_STATE | jq -cr \
     --arg commitDate $COMMIT_DATE \
     --arg date $DATE \
     --arg sha $SHA \
-    ".\"$APP\" = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha }")"
+    --arg buildNumber $BUILD_NUMBER \
+    ".\"$APP\" = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha, buildNumber: \$buildNumber }")"
 
 echo Updating environment state for $ENV
 aws secretsmanager update-secret --secret-id "$ENV"_environment_state --secret-string "$NEW_STATE" > /dev/null
