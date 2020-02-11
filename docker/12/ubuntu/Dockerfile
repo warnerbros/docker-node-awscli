@@ -13,6 +13,7 @@ RUN apt-get update \
         curl \
         git \
         unzip \
+        zip \
         apt-transport-https \
         jq \
         gpg-agent \
