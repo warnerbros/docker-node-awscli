@@ -23,7 +23,7 @@ RUN apt-get update \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install awscli
+RUN pip3 install awscli awslogs
 
 # install node/yarn
 COPY docker/10/ubuntu/nodesource.gpg.key /tmp/nodesource.gpg.key
@@ -47,7 +47,7 @@ RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
     && sed -i '/[ -z \"PS1\" ] && return/a\\ncase $- in\n*i*) ;;\n*) return;;\nesac' /root/.bashrc \
     && useradd --create-home --shell /bin/bash --uid 1000 pipelines
 
-# install saw
+# deprecated, should be removed at a later stage
 RUN wget https://github.com/TylerBrock/saw/releases/download/v0.2.2/saw_0.2.2_linux_amd64.tar.gz \
     && tar -xzvf saw_0.2.2_linux_amd64.tar.gz saw \
     && mv saw /usr/local/bin \

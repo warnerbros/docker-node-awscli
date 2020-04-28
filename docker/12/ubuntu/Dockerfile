@@ -24,7 +24,7 @@ RUN apt-get update \
     && curl -s -O https://bootstrap.pypa.io/get-pip.py \
     && python3 get-pip.py \
     && rm get-pip.py \
-    && pip install --no-cache-dir awscli \
+    && pip install --no-cache-dir awscli awslogs \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && find /usr/ -name '*.pyc' -delete
@@ -52,7 +52,7 @@ RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
     && sed -i '/[ -z \"PS1\" ] && return/a\\ncase $- in\n*i*) ;;\n*) return;;\nesac' /root/.bashrc \
     && useradd --create-home --shell /bin/bash --uid 1000 pipelines
 
-# install saw
+# deprecated, should be removed at a later stage
 RUN wget https://github.com/TylerBrock/saw/releases/download/v0.2.2/saw_0.2.2_linux_amd64.tar.gz \
     && tar -xzvf saw_0.2.2_linux_amd64.tar.gz saw \
     && mv saw /usr/local/bin \
