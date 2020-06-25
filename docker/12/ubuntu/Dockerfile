@@ -3,7 +3,8 @@ FROM ubuntu:18.04
 # Default to UTF-8 file.encoding
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    LANGUAGE=C.UTF-8
+    LANGUAGE=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive
 
 # Install base dependencies
 RUN apt-get update \
@@ -46,6 +47,8 @@ RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
     && rm -rf /var/lib/apt/lists/* \
     && rm /tmp/nodesource.gpg.key \
     && rm /tmp/yarn-pubkey.gpg
+
+RUN yarn global add typescript ts-node && yarn cache clean
 
 # Create dirs and users
 RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \

@@ -7,6 +7,7 @@ RUN apk add --no-cache \
         jq \
         groff \
         python3 \
+        coreutils \
     &&  apk --update add --virtual build-dependencies python3-dev \
     &&  curl -s -O https://bootstrap.pypa.io/get-pip.py \
     &&  python3 get-pip.py \
