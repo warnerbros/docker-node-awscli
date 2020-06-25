@@ -12,19 +12,19 @@ function filterEnvironmentVariables(whitelist, log, name, value) {
   }
 
   if (whitelist.has(name)) {
-    log(`Not redacting '${name}' as it appears in CREDENTIAL_FILTER_WHITELIST`);
+    // log(`Not redacting '${name}' as it appears in CREDENTIAL_FILTER_WHITELIST`);
     return false;
   }
 
   const trimmedValue = value.trim();
 
   if (trimmedValue === '') {
-    log(`Not redacting '${name}' as its value is empty`);
+    // log(`Not redacting '${name}' as its value is empty`);
     return false;
   }
 
   if (shortIntegerRegex.test(trimmedValue)) {
-    log(`Not redacting '${name}' as it is less than 5 characters and just digits`);
+    // log(`Not redacting '${name}' as it is less than 5 characters and just digits`);
     return false;
   }
 

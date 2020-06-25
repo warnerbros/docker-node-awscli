@@ -73,12 +73,12 @@ if [ -z "$OLD_STATE" ]; then
 fi
 
 NEW_STATE="$(echo $OLD_STATE | jq -cr \
-    --arg app $APP \
-    --arg branch $BRANCH \
-    --arg commitDate $COMMIT_DATE \
-    --arg date $DATE \
-    --arg sha $SHA \
-    --arg buildNumber $BUILD_NUMBER \
+    --arg app "$APP" \
+    --arg branch "$BRANCH" \
+    --arg commitDate "$COMMIT_DATE" \
+    --arg date "$DATE" \
+    --arg sha "$SHA" \
+    --arg buildNumber "$BUILD_NUMBER" \
     ".\"$APP\" = {branch: \$branch, commitDate: \$commitDate, date: \$date, sha: \$sha, buildNumber: \$buildNumber }")"
 
 echo Updating environment state for $ENV
