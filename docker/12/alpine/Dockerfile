@@ -15,7 +15,8 @@ RUN apk add --no-cache \
     &&  pip install --no-cache-dir awscli \
     &&  apk del build-dependencies \
     && find /usr/bin/ -name '*.pyc' -delete \
-    && find /usr/lib/ -name '*.pyc' -delete
+    && find /usr/lib/ -name '*.pyc' -delete \
+    && yarn global add snyk && yarn cache clean
 
 ENV NODE_PATH /usr/local/lib/node_modules
 ENV PYTHONWARNINGS ignore::SyntaxWarning
