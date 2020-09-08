@@ -30,6 +30,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && find /usr/ -name '*.pyc' -delete
 
+COPY --from=hashicorp/terraform:0.11.14 /bin/terraform /bin/terraform
+COPY --from=hashicorp/terraform:0.12.24 /bin/terraform /bin/terraform12
+
 # install node/yarn
 COPY docker/12/ubuntu/nodesource.gpg.key /tmp/nodesource.gpg.key
 COPY docker/12/ubuntu/yarn-pubkey.gpg /tmp/yarn-pubkey.gpg
