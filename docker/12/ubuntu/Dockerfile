@@ -51,7 +51,7 @@ RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
     && rm /tmp/nodesource.gpg.key \
     && rm /tmp/yarn-pubkey.gpg
 
-RUN yarn global add typescript ts-node && yarn cache clean
+RUN yarn global add typescript ts-node snyk && yarn cache clean
 
 # Create dirs and users
 RUN mkdir -p /opt/atlassian/bitbucketci/agent/build \
