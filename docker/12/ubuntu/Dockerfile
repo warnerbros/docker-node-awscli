@@ -14,6 +14,7 @@ RUN apt-get update \
         curl \
         git \
         unzip \
+        rsync \
         zip \
         apt-transport-https \
         jq \
@@ -42,6 +43,8 @@ RUN apt-key add /tmp/nodesource.gpg.key /tmp/yarn-pubkey.gpg \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends nodejs yarn \
+    # update npm to the latest
+    && npm install -g npm
     # we're breaking the package manager here because,
     # nodejs comes with a hard dependency on python 2.7
     # https://github.com/nodejs/node/issues/25789
